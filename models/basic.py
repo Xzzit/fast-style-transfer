@@ -116,3 +116,27 @@ class SelfAttention(nn.Module):
         beta = self.sm(torch.bmm(f.transpose(1, 2), g))
         o = self.gamma * torch.bmm(h, beta) + x
         return o.view(*shape).contiguous()
+
+
+class ResNextLayer(nn.Module):
+    """
+    Aggregated Residual Transformations for Deep Neural Networks
+        Equal to better performance with 10x less parameters
+    https://arxiv.org/abs/1611.05431
+    """
+    def __init__(self, in_ch=128, channels=[64, 64, 128], kernel_size=3):
+        super(ResNextLayer, self).__init__()
+        ch1, ch2, ch3 = channels
+        self.conv1 = ConvLayer(in_ch, ch1, kernel_size=1, stride=1)
+        self.relu1 = nn.ReLU()
+        self.conv2 = ConvLayer(ch1, ch2, kernel_size=kernel_size, stride=1)
+        self.relu2 = nn.ReLU()
+        self.conv3 = ConvLayer(ch2, ch3, kernel_size=1, stride=1)
+
+    def forward(self, x):
+        identity = x
+        out = self.relu1(self.conv1(x))
+        out = self.relu2(self.conv2(out))
+        out = self.conv3(out)
+        out = out + identity
+        return out
