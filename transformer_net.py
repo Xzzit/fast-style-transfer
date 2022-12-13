@@ -17,27 +17,27 @@ class TransformerNet(torch.nn.Module):
         self.res3 = ResidualBlock(128)
         self.res4 = ResidualBlock(128)
         self.res5 = ResidualBlock(128)
-        # Upsampling Layers
+        # Up-sampling Layers
         self.deconv1 = UpsampleConvLayer(128, 64, kernel_size=3, stride=1, upsample=2)
         self.in4 = torch.nn.InstanceNorm2d(64, affine=True)
         self.deconv2 = UpsampleConvLayer(64, 32, kernel_size=3, stride=1, upsample=2)
         self.in5 = torch.nn.InstanceNorm2d(32, affine=True)
         self.deconv3 = ConvLayer(32, 3, kernel_size=9, stride=1)
-        # Non-linearities
+        # Non-linearity
         self.relu = torch.nn.ReLU()
 
-    def forward(self, X):
-        y = self.relu(self.in1(self.conv1(X)))
-        y = self.relu(self.in2(self.conv2(y)))
-        y = self.relu(self.in3(self.conv3(y)))
+    def forward(self, x):  # (b, 3, h, w)
+        y = self.relu(self.in1(self.conv1(x)))  # (b, 32, h, w)
+        y = self.relu(self.in2(self.conv2(y)))  # (b, 64, h//2, w//2)
+        y = self.relu(self.in3(self.conv3(y)))  # (b, 128, h//4, w//4)
         y = self.res1(y)
         y = self.res2(y)
         y = self.res3(y)
         y = self.res4(y)
         y = self.res5(y)
-        y = self.relu(self.in4(self.deconv1(y)))
-        y = self.relu(self.in5(self.deconv2(y)))
-        y = self.deconv3(y)
+        y = self.relu(self.in4(self.deconv1(y)))  # (b, 64, h//4, w//4)
+        y = self.relu(self.in5(self.deconv2(y)))  # (b, 32, h//2, w//2)
+        y = self.deconv3(y)  # (b, 3, h, w)
         return y
 
 
@@ -97,3 +97,9 @@ class UpsampleConvLayer(torch.nn.Module):
         out = self.reflection_pad(x_in)
         out = self.conv2d(out)
         return out
+
+
+if __name__ == "__main__":
+    test_data = torch.randn(5, 3, 256, 256)
+    trans = TransformerNet()
+    y = trans(test_data)
