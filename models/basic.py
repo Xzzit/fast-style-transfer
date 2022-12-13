@@ -1,17 +1,30 @@
 import torch
+import torch.nn as nn
 
 
 class ConvLayer(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
-        reflection_padding = kernel_size // 2
-        self.reflection_pad = torch.nn.ReflectionPad2d(reflection_padding)
-        self.conv2d = torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+        padding_size = kernel_size // 2
+        self.reflection_pad = nn.ReflectionPad2d(padding_size)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+
+        if norm_type == 'instance':
+            self.norm = nn.InstanceNorm2d(out_channels, affine=True)
+        elif norm_type == 'batch':
+            self.norm = nn.BatchNorm2d(out_channels, affine=True)
+
+        self.norm_type = norm_type
 
     def forward(self, x):
-        out = self.reflection_pad(x)
-        out = self.conv2d(out)
-        return out
+        y = self.reflection_pad(x)
+        y = self.conv(y)
+
+        if self.norm_type == 'None':
+            pass
+        else:
+            y = self.norm(y)
+        return y
 
 
 class ResidualBlock(torch.nn.Module):
@@ -23,17 +36,15 @@ class ResidualBlock(torch.nn.Module):
     def __init__(self, channels):
         super().__init__()
         self.conv1 = ConvLayer(channels, channels, kernel_size=3, stride=1)
-        self.in1 = torch.nn.InstanceNorm2d(channels, affine=True)
         self.conv2 = ConvLayer(channels, channels, kernel_size=3, stride=1)
-        self.in2 = torch.nn.InstanceNorm2d(channels, affine=True)
-        self.relu = torch.nn.ReLU()
+        self.relu = nn.ReLU()
 
     def forward(self, x):
         residual = x
-        out = self.relu(self.in1(self.conv1(x)))
-        out = self.in2(self.conv2(out))
-        out = out + residual
-        return out
+        y = self.relu(self.conv1(x))
+        y = self.conv2(y)
+        y = y + residual
+        return y
 
 
 class UpsampleConvLayer(torch.nn.Module):
@@ -56,6 +67,30 @@ class UpsampleConvLayer(torch.nn.Module):
             x_in = torch.nn.functional.interpolate(x_in, mode='nearest', scale_factor=self.upsample)
         out = self.reflection_pad(x_in)
         out = self.conv2d(out)
+        return out
+
+
+class DeconvLayer(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, output_padding, norm="instance"):
+        super(DeconvLayer, self).__init__()
+
+        # Transposed Convolution
+        padding_size = kernel_size // 2
+        self.conv_transpose = nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, padding_size, output_padding)
+
+        # Normalization Layers
+        self.norm_type = norm
+        if (norm=="instance"):
+            self.norm_layer = nn.InstanceNorm2d(out_channels, affine=True)
+        elif (norm=="batch"):
+            self.norm_layer = nn.BatchNorm2d(out_channels, affine=True)
+
+    def forward(self, x):
+        x = self.conv_transpose(x)
+        if (self.norm_type=="None"):
+            out = x
+        else:
+            out = self.norm_layer(x)
         return out
 
 
