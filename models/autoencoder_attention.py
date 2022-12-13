@@ -2,6 +2,12 @@ import torch
 import torch.nn as nn
 from basic import ConvLayer, ResidualBlock, DeconvLayer, SelfAttention
 
+"""
+Note that attention mechanism consume huge amount of computational resources
+256 x 256 image is ok for 32gb RAM
+1080 x 1080 is not work
+"""
+
 
 class AutoencoderAttention(nn.Module):
     def __init__(self):
