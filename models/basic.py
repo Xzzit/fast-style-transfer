@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class ConvLayer(torch.nn.Module):
+class ConvLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
         padding_size = kernel_size // 2
@@ -27,7 +27,7 @@ class ConvLayer(torch.nn.Module):
         return y
 
 
-class ResidualBlock(torch.nn.Module):
+class ResidualBlock(nn.Module):
     """ResidualBlock
     introduced in: https://arxiv.org/abs/1512.03385
     recommended architecture: http://torch.ch/blog/2016/02/04/resnets.html
@@ -47,7 +47,7 @@ class ResidualBlock(torch.nn.Module):
         return y
 
 
-class UpsampleConvLayer(torch.nn.Module):
+class UpsampleConvLayer(nn.Module):
     """UpsampleConvLayer
     Upsamples the input and then does a convolution. This method gives better results
     compared to ConvTranspose2d.
@@ -58,13 +58,13 @@ class UpsampleConvLayer(torch.nn.Module):
         super().__init__()
         self.upsample = upsample
         reflection_padding = kernel_size // 2
-        self.reflection_pad = torch.nn.ReflectionPad2d(reflection_padding)
-        self.conv2d = torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+        self.reflection_pad = nn.ReflectionPad2d(reflection_padding)
+        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride)
 
     def forward(self, x):
         x_in = x
         if self.upsample:
-            x_in = torch.nn.functional.interpolate(x_in, mode='nearest', scale_factor=self.upsample)
+            x_in = nn.functional.interpolate(x_in, mode='nearest', scale_factor=self.upsample)
         out = self.reflection_pad(x_in)
         out = self.conv2d(out)
         return out
@@ -80,32 +80,32 @@ class DeconvLayer(nn.Module):
 
         # Normalization Layers
         self.norm_type = norm
-        if (norm=="instance"):
+        if norm == "instance":
             self.norm_layer = nn.InstanceNorm2d(out_channels, affine=True)
-        elif (norm=="batch"):
+        elif norm == "batch":
             self.norm_layer = nn.BatchNorm2d(out_channels, affine=True)
 
     def forward(self, x):
         x = self.conv_transpose(x)
-        if (self.norm_type=="None"):
+        if self.norm_type == "None":
             out = x
         else:
             out = self.norm_layer(x)
         return out
 
 
-class SelfAttention(torch.nn.Module):
+class SelfAttention(nn.Module):
 
     def __init__(self, channels):
         super().__init__()
         self.query = self.conv(channels, channels // 8)
         self.key = self.conv(channels, channels // 8)
         self.value = self.conv(channels, channels)
-        self.gamma = torch.nn.Parameter(torch.tensor([0.]))
-        self.sm = torch.nn.Softmax(dim=1)
+        self.gamma = nn.Parameter(torch.tensor([0.]))
+        self.sm = nn.Softmax(dim=1)
 
     def conv(self, n_in, n_out):
-        return torch.nn.Conv1d(n_in, n_out, 1, bias=False)
+        return nn.Conv1d(n_in, n_out, 1, bias=False)
 
     def forward(self, x):
         shape = x.size()
