@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from basic import ConvLayer, ResidualBlock, DeconvLayer
+from models.basic import ConvLayer, ResidualBlock, DeconvLayer
 
 
 class Autoencoder(nn.Module):
