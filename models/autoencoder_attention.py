@@ -3,7 +3,7 @@ import torch.nn as nn
 from basic import ConvLayer, ResidualBlock, DeconvLayer, SelfAttention
 
 
-class AutoencoderAttention(torch.nn.Module):
+class AutoencoderAttention(nn.Module):
     def __init__(self):
         super().__init__()
         # Initial convolution block
