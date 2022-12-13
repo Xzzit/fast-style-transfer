@@ -2,16 +2,10 @@ import torch.nn as nn
 from basic import ConvLayer, DeconvLayer, ResNextLayer
 
 
-class TransformerResNextNetwork(nn.Module):
-    """
-    Feedforward Transformation Network - ResNeXt
-
-        - No Tanh
-        + ResNeXt Layer
-    """
+class ResNextNetwork(nn.Module):
 
     def __init__(self):
-        super(TransformerResNextNetwork, self).__init__()
+        super().__init__()
         self.ConvBlock = nn.Sequential(
             ConvLayer(3, 32, 9, 1),
             nn.ReLU(),
