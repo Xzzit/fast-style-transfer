@@ -6,7 +6,7 @@ from basic import ConvLayer, ResidualBlock, DeconvLayer, SelfAttention
 class AutoencoderAttention(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        # Initial convolution layers
+        # Initial convolution block
         self.ConvBlock = nn.Sequential(
             ConvLayer(3, 32, 9, 1),  # (b, 32, h, w)
             nn.ReLU(),
@@ -16,12 +16,12 @@ class AutoencoderAttention(torch.nn.Module):
             nn.ReLU()
         )
 
-        # Residual layers
+        # Residual block
         self.ResidualBlock = nn.Sequential(
             *[ResidualBlock(128) for _ in range(5)]
         )
 
-        # Up-sampling Layers
+        # Deconvolution block
         self.DeconvBlock = nn.Sequential(
             DeconvLayer(128, 64, 3, 2, 1),  # (b, 64, h//4, w//4)
             nn.ReLU(),
