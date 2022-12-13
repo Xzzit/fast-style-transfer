@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from basic import ConvLayer, ResidualBlock, DeconvLayer, SelfAttention
+from models.basic import ConvLayer, ResidualBlock, DeconvLayer, SelfAttention
 
 """
 Note that attention mechanism consume huge amount of computational resources
