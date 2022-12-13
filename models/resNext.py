@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from basic import ConvLayer, DeconvLayer, ResNextLayer
 
@@ -26,7 +27,7 @@ class ResNextNetwork(nn.Module):
             nn.ReLU(),
             DeconvLayer(64, 32, 3, 2, 1),
             nn.ReLU(),
-            ConvLayer(32, 3, 9, 1, norm="None")
+            ConvLayer(32, 3, 9, 1, norm_type="None")
         )
 
     def forward(self, x):
@@ -34,3 +35,13 @@ class ResNextNetwork(nn.Module):
         x = self.ResidualBlock(x)
         out = self.DeconvBlock(x)
         return out
+
+
+if __name__ == "__main__":
+    test_data = torch.randn(5, 3, 256, 256)
+    print('Before: ', test_data.shape)
+
+    trans = ResNextNetwork()
+    print('# of parameters: ', sum(p.numel() for p in trans.parameters()))
+
+    print('After: ', trans(test_data).shape)
