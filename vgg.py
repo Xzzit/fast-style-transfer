@@ -1,9 +1,9 @@
-from collections import namedtuple
-
 import torch
+from collections import namedtuple
 from torchvision import models
 
 
+# Define a pre-trained vgg-16 network
 class Vgg16(torch.nn.Module):
     def __init__(self, requires_grad=False):
         super(Vgg16, self).__init__()
@@ -24,8 +24,8 @@ class Vgg16(torch.nn.Module):
             for param in self.parameters():
                 param.requires_grad = False
 
-    def forward(self, X):
-        h = self.slice1(X)
+    def forward(self, x):
+        h = self.slice1(x)
         h_relu1_2 = h
         h = self.slice2(h)
         h_relu2_2 = h
