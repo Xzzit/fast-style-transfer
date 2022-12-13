@@ -178,13 +178,13 @@ class ResNextLayer(nn.Module):
 
 
 class NormReluConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride, norm="instance"):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type="instance"):
         super().__init__()
 
         # Normalization Layers
-        if (norm=="instance"):
+        if norm_type == "instance":
             self.norm_layer = nn.InstanceNorm2d(in_channels, affine=True)
-        elif (norm=="batch"):
+        elif norm_type == "batch":
             self.norm_layer = nn.BatchNorm2d(in_channels, affine=True)
 
         # ReLU Layer
@@ -205,14 +205,14 @@ class NormReluConv(nn.Module):
         return x
 
 
-class NormLReluConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride, norm="instance"):
+class NormReluConvNB(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type="instance"):
         super().__init__()
 
         # Normalization Layers
-        if (norm=="instance"):
+        if norm_type == "instance":
             self.norm_layer = nn.InstanceNorm2d(in_channels, affine=True)
-        elif (norm=="batch"):
+        elif norm_type == "batch":
             self.norm_layer = nn.BatchNorm2d(in_channels, affine=True)
 
         # ReLU Layer
@@ -241,8 +241,8 @@ class DenseLayerBottleNeck(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
 
-        self.conv1 = NormLReluConv(in_channels, 4*out_channels, 1, 1)
-        self.conv3 = NormLReluConv(4*out_channels, out_channels, 3, 1)
+        self.conv1 = NormReluConvNB(in_channels, 4*out_channels, 1, 1)
+        self.conv3 = NormReluConvNB(4*out_channels, out_channels, 3, 1)
 
     def forward(self, x):
         out = self.conv3(self.conv1(x))
