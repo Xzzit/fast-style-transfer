@@ -32,12 +32,9 @@ class ConvLayerNB(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
 
-        # Padding Layers
-        padding_size = kernel_size // 2
-        self.reflection_pad = nn.ReflectionPad2d(padding_size)
-
         # Convolution Layer
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, bias=False)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                              padding=kernel_size//2, padding_mode='reflect', bias=False)
 
         # Normalization Layers
         if norm_type == 'instance':
@@ -48,8 +45,7 @@ class ConvLayerNB(nn.Module):
         self.norm_type = norm_type
 
     def forward(self, x):
-        y = self.reflection_pad(x)
-        y = self.conv(y)
+        y = self.conv(x)
 
         if self.norm_type == 'None':
             pass
@@ -214,17 +210,13 @@ class NormReluConvNB(nn.Module):
         # ReLU Layer
         self.relu_layer = nn.ReLU()
 
-        # Padding Layers
-        padding_size = kernel_size // 2
-        self.reflection_pad = nn.ReflectionPad2d(padding_size)
-
         # Convolution Layer
-        self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride, bias=False)
+        self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                                    padding=kernel_size//2, padding_mode='reflect', bias=False)
 
     def forward(self, x):
         x = self.norm_layer(x)
         x = self.relu_layer(x)
-        x = self.reflection_pad(x)
         x = self.conv_layer(x)
         return x
 
