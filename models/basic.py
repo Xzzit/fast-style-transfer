@@ -183,17 +183,13 @@ class NormReluConv(nn.Module):
         # ReLU Layer
         self.relu_layer = nn.ReLU()
 
-        # Padding Layers
-        padding_size = kernel_size // 2
-        self.reflection_pad = nn.ReflectionPad2d(padding_size)
-
         # Convolution Layer
-        self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+        self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                                    padding=kernel_size//2, padding_mode='reflect')
 
     def forward(self, x):
         x = self.norm_layer(x)
         x = self.relu_layer(x)
-        x = self.reflection_pad(x)
         x = self.conv_layer(x)
         return x
 
