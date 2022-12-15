@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from basic import ConvLayer, DeconvLayer, ResNextLayer
+from basic import ConvLayer, DeconvLayer, BottleNetLayer
 
 
-class ResNextNetwork(nn.Module):
+class BottleNetwork(nn.Module):
 
     def __init__(self):
         super().__init__()
@@ -16,11 +16,7 @@ class ResNextNetwork(nn.Module):
             nn.ReLU()
         )
         self.ResidualBlock = nn.Sequential(
-            ResNextLayer(128, [64, 64, 128], kernel_size=3),
-            ResNextLayer(128, [64, 64, 128], kernel_size=3),
-            ResNextLayer(128, [64, 64, 128], kernel_size=3),
-            ResNextLayer(128, [64, 64, 128], kernel_size=3),
-            ResNextLayer(128, [64, 64, 128], kernel_size=3)
+            *[BottleNetLayer(128, [64, 64, 128], kernel_size=3) for _ in range(5)]
         )
         self.DeconvBlock = nn.Sequential(
             DeconvLayer(128, 64, 3, 2, 1),

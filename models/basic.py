@@ -146,7 +146,7 @@ class SelfAttention(nn.Module):
         return o.view(*shape).contiguous()
 
 
-class ResNextLayer(nn.Module):
+class BottleNetLayer(nn.Module):
     """
     Aggregated Residual Transformations for Deep Neural Networks
         Equal to better performance with 10x less parameters
