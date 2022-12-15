@@ -71,6 +71,7 @@ class ResidualBlock(nn.Module):
         y = self.relu(self.conv1(x))
         y = self.conv2(y)
         y = y + residual
+        y = nn.ReLU(y)
         return y
 
 
