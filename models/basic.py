@@ -3,6 +3,9 @@ import torch.nn as nn
 
 
 class ConvLayer(nn.Module):
+    """
+    conv -> Ins/Batch norm
+    """
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
 
@@ -29,6 +32,9 @@ class ConvLayer(nn.Module):
 
 
 class ConvLayerNB(nn.Module):
+    """
+    conv w/o bias -> Ins/Batch norm
+    """
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
 
@@ -55,7 +61,8 @@ class ConvLayerNB(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-    """ResidualBlock
+    """
+    ResidualBlock
     introduced in: https://arxiv.org/abs/1512.03385
     recommended architecture: http://torch.ch/blog/2016/02/04/resnets.html
     """
@@ -76,7 +83,8 @@ class ResidualBlock(nn.Module):
 
 
 class UpsampleConvLayer(nn.Module):
-    """UpsampleConvLayer
+    """
+    UpsampleConvLayer
     Upsamples the input and then does a convolution. This method gives better results
     compared to ConvTranspose2d.
     ref: http://distill.pub/2016/deconv-checkerboard/
@@ -149,7 +157,7 @@ class SelfAttention(nn.Module):
 class BottleNetLayer(nn.Module):
     """
     Aggregated Residual Transformations for Deep Neural Networks
-        Equal to better performance with 10x less parameters
+    Equal to better performance with 10x less parameters
     https://arxiv.org/abs/1611.05431
     """
     def __init__(self, in_ch=128, channels=[64, 64, 128], kernel_size=3):
@@ -171,6 +179,9 @@ class BottleNetLayer(nn.Module):
 
 
 class NormReluConv(nn.Module):
+    """
+    Ins/Batch norm -> ReLU -> conv
+    """
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type="instance"):
         super().__init__()
 
@@ -195,6 +206,9 @@ class NormReluConv(nn.Module):
 
 
 class NormReluConvNB(nn.Module):
+    """
+    Ins/Batch norm -> ReLU -> conv w/o bias
+    """
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type="instance"):
         super().__init__()
 
