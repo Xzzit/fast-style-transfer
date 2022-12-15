@@ -37,7 +37,7 @@ if __name__ == "__main__":
     test_data = torch.randn(5, 3, 256, 256)
     print('Before: ', test_data.shape)
 
-    trans = ResNextNetwork()
+    trans = BottleNetwork()
     print('# of parameters: ', sum(p.numel() for p in trans.parameters()))
 
     print('After: ', trans(test_data).shape)
