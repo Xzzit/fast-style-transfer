@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class ConvLayer(nn.Module):
@@ -35,12 +36,12 @@ class ConvLayerNB(nn.Module):
     """
     conv w/o bias -> Ins/Batch norm
     """
-    def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, groups=1, norm_type='instance'):
         super().__init__()
 
         # Convolution Layer
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
-                              padding=kernel_size//2, padding_mode='reflect', bias=False)
+                              padding=kernel_size//2, padding_mode='reflect', bias=False, groups=groups)
 
         # Normalization Layers
         if norm_type == 'instance':
@@ -71,14 +72,13 @@ class ResidualBlock(nn.Module):
         super().__init__()
         self.conv1 = ConvLayer(channels, channels, kernel_size=3, stride=1)
         self.conv2 = ConvLayer(channels, channels, kernel_size=3, stride=1)
-        self.relu = nn.ReLU()
 
     def forward(self, x):
         residual = x
-        y = self.relu(self.conv1(x))
+        y = F.relu(self.conv1(x), inplace=True)
         y = self.conv2(y)
         y = y + residual
-        y = self.relu(y)
+        y = F.relu(y, inplace=True)
         return y
 
 
@@ -164,15 +164,13 @@ class BottleNetLayer(nn.Module):
         super().__init__()
         ch1, ch2, ch3 = channels
         self.conv1 = ConvLayer(in_ch, ch1, kernel_size=1, stride=1)
-        self.relu1 = nn.ReLU()
         self.conv2 = ConvLayer(ch1, ch2, kernel_size=kernel_size, stride=1)
-        self.relu2 = nn.ReLU()
         self.conv3 = ConvLayer(ch2, ch3, kernel_size=1, stride=1)
 
     def forward(self, x):
         identity = x
-        out = self.relu1(self.conv1(x))
-        out = self.relu2(self.conv2(out))
+        out = F.relu(self.conv1(x), inplace=True)
+        out = F.relu(self.conv2(out), inplace=True)
         out = self.conv3(out)
         out = out + identity
         return out
@@ -191,16 +189,13 @@ class NormReluConv(nn.Module):
         elif norm_type == "batch":
             self.norm_layer = nn.BatchNorm2d(in_channels, affine=True)
 
-        # ReLU Layer
-        self.relu_layer = nn.ReLU()
-
         # Convolution Layer
         self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                                     padding=kernel_size//2, padding_mode='reflect')
 
     def forward(self, x):
         x = self.norm_layer(x)
-        x = self.relu_layer(x)
+        x = F.relu(x, inplace=True)
         x = self.conv_layer(x)
         return x
 
@@ -218,16 +213,13 @@ class NormReluConvNB(nn.Module):
         elif norm_type == "batch":
             self.norm_layer = nn.BatchNorm2d(in_channels, affine=True)
 
-        # ReLU Layer
-        self.relu_layer = nn.ReLU()
-
         # Convolution Layer
         self.conv_layer = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
                                     padding=kernel_size//2, padding_mode='reflect', bias=False)
 
     def forward(self, x):
         x = self.norm_layer(x)
-        x = self.relu_layer(x)
+        x = F.relu(x, inplace=True)
         x = self.conv_layer(x)
         return x
 
@@ -247,3 +239,26 @@ class DenseLayerBottleNeck(nn.Module):
         out = self.conv3(self.conv1(x))
         out = torch.cat((x, out), 1)
         return out
+
+
+class ResNextBottleneck(nn.Module):
+    """
+    paper: https://arxiv.org/abs/1611.05431
+    """
+
+    def __init__(self, channels, cardinality):
+        super().__init__()
+
+        D = channels // 2
+
+        self.conv1 = ConvLayerNB(channels, D, 1, 1, norm_type='batch')
+        self.conv2 = ConvLayerNB(D, D, 3, 1, groups=cardinality, norm_type='batch')
+        self.conv3 = ConvLayerNB(D, channels, 1, 1, norm_type='batch')
+
+    def forward(self, x):
+        y = self.conv1(x)
+        y = F.relu(y, inplace=True)
+        y = self.conv2(y)
+        y = F.relu(y, inplace=True)
+        y = self.conv3(y)
+        return F.relu(x + y, inplace=True)

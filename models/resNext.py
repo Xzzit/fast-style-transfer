@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from models.basic import ConvLayer, ResidualBlock, DeconvLayer
+from models.basic import ConvLayer, ResNextBottleneck, DeconvLayer
 
 
-class Autoencoder(nn.Module):
+class ResNext(nn.Module):
     def __init__(self):
         super().__init__()
         # Initial convolution block
@@ -16,9 +16,9 @@ class Autoencoder(nn.Module):
             nn.ReLU()
         )
 
-        # Residual block
-        self.ResidualBlock = nn.Sequential(
-            *[ResidualBlock(128) for _ in range(5)]
+        # ResNext block
+        self.ResNextBottleneck = nn.Sequential(
+            *[ResNextBottleneck(128, 32) for _ in range(5)]
         )
 
         # Deconvolution block
@@ -32,7 +32,7 @@ class Autoencoder(nn.Module):
 
     def forward(self, x):
         y = self.ConvBlock(x)
-        y = self.ResidualBlock(y)
+        y = self.ResNextBottleneck(y)
         y = self.DeconvBlock(y)
         return y
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     test_data = torch.randn(5, 3, 256, 256)
     print('Before: ', test_data.shape)
 
-    trans = Autoencoder()
+    trans = ResNext()
     print('# of parameters: ', sum(p.numel() for p in trans.parameters()))
 
     print('After: ', trans(test_data).shape)
