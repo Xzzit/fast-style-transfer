@@ -6,12 +6,9 @@ class ConvLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, norm_type='instance'):
         super().__init__()
 
-        # Padding Layers
-        padding_size = kernel_size // 2
-        self.reflection_pad = nn.ReflectionPad2d(padding_size)
-
         # Convolution Layer
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride,
+                              padding=kernel_size//2, padding_mode='reflect')
 
         # Normalization Layers
         if norm_type == 'instance':
@@ -22,8 +19,7 @@ class ConvLayer(nn.Module):
         self.norm_type = norm_type
 
     def forward(self, x):
-        y = self.reflection_pad(x)
-        y = self.conv(y)
+        y = self.conv(x)
 
         if self.norm_type == 'None':
             pass
