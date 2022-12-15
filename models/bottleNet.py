@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from basic import ConvLayer, DeconvLayer, BottleNetLayer
+from models.basic import ConvLayer, DeconvLayer, BottleNetLayer
 
 
 class BottleNetwork(nn.Module):
