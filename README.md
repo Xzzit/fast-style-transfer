@@ -13,6 +13,7 @@ Tested With:
 
 ```
 conda create -n fst python=3.7
+conda activate fst
 pip install -r requirements.txt
 ```
 
