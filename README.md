@@ -8,7 +8,13 @@ This repo is based on the code [**fast-neural-style-pytorch**](https://github.co
 
 ## Dependencies
 Tested With:
-* Python
+* Python 3.7.15
+* Pytorch 1.10
+
+```
+conda create -n fst python=3.7
+pip install -r requirements.txt
+```
 
 ## Example Output
 
