@@ -13,7 +13,7 @@ from models.bottleNet import BottleNetwork
 
 def stylize(content_image, model, output_image, name):
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cup')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     content_image = utils.load_image(content_image)
     content_transform = transforms.Compose([
