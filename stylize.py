@@ -1,5 +1,4 @@
 import os
-import sys
 import re
 
 import torch
@@ -8,24 +7,15 @@ from torchvision.utils import save_image
 import torch.onnx
 
 import utils
-from transformer_net import TransformerNet, TransformerNet_Atten
+from models.autoencoder import Autoencoder
+from models.bottleNet import BottleNetwork
 
 
-def check_paths(save_model_dir, checkpoint_model_dir):
-    try:
-        if not os.path.exists(save_model_dir):
-            os.makedirs(save_model_dir)
-        if checkpoint_model_dir is not None and not (os.path.exists(checkpoint_model_dir)):
-            os.makedirs(checkpoint_model_dir)
-    except OSError as e:
-        print(e)
-        sys.exit(1)
+def stylize(content_image, model, output_image, name):
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cup')
 
-def stylize(cuda, content_image, content_scale, model, output_image, name):
-    device = torch.device("cuda" if cuda else "cpu")
-
-    content_image = utils.load_image(content_image, size=[1080, 1080], scale=content_scale)
+    content_image = utils.load_image(content_image)
     content_transform = transforms.Compose([
         transforms.ToTensor(),
         # mean=[0.40760392, 0.45795686, 0.48501961], std=[1, 1, 1]
@@ -36,11 +26,10 @@ def stylize(cuda, content_image, content_scale, model, output_image, name):
         transforms.Lambda(lambda x: x.mul_(1. / 255)),
         # transforms.Normalize(mean=[-0.185, -0.156, -0.106], std=[1, 1, 1]),
     ])
-    content_image = content_transform(content_image)
-    content_image = content_image.unsqueeze(0).to(device)
+    content_image = content_transform(content_image).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        style_model = TransformerNet_Atten()
+        style_model = BottleNetwork()
         state_dict = torch.load(model)
         # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
         for k in list(state_dict.keys()):
@@ -54,17 +43,13 @@ def stylize(cuda, content_image, content_scale, model, output_image, name):
     save_image(output[0], os.path.join(output_image, name))
 
 
-cuda = 'cuda'
-content_scale = 1
-
-
 '''
 This code is used for single photo stylizing
 '''
-model = 'D:/Project/PyPro/StyleTransfer/StyleTransfer/my_models/mosaic_c1E05_s1E10_p1E03_.pth'
-img_dir = 'E:\project\Python\StyleTransfer/brick.jpg'
-output_image = 'E:\project\Python\StyleTransfer'
-stylize(cuda, img_dir, content_scale, model, output_image, 'fire.jpg')
+model = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer\pretrained_models/Fauvism_André-Derain_Pier_c1E05_s1E10_p1E01.pth'
+img_dir = 'D:\Project\PyPro\data\coco2017/val2017/000000000285.jpg'
+output_image = './'
+stylize(img_dir, model, output_image, '1.jpg')
 
 '''
 This code is used for multiple photo stylizing with one model
