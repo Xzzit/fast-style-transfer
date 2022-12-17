@@ -23,7 +23,7 @@ pip install -r requirements.txt
 ## Hardware Requirements
 
 ## Usage
-Train the model
+***Train the model*** :hammer_and_wrench:
 
 ```
 python train_arg.py --dataset <path/to/content/images/folder> --style-image <path/to/style/image/file>
@@ -40,7 +40,7 @@ python train_arg.py --dataset <path/to/content/images/folder> --style-image <pat
 
 Refer to `train_arg.py` for other command line arguments. For training new models you might have to tune the values of `--content-weight` and `--style-weight`.
 
-Stylize the image
+***Stylize the image*** :paintbrush:
 
 ```
 python stylize_arg.py --content-image <path/to/content/image/file> --model <path/to/saved/model>
@@ -52,5 +52,3 @@ python stylize_arg.py --content-image <path/to/content/image/file> --model <path
 - `--output-name`: path for saving the output image.
 - `--content-scale`: factor for scaling down the content image if memory is an issue (eg: value of 2 will halve the height and width of content-image)
 - `--mps`: add it for running on macOS GPU
-
-## What's New
