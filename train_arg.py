@@ -37,7 +37,10 @@ class CustomDataSet(Dataset):
 def train(args):
 
     # Set device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if args.mps:
+        device = torch.device('mps')
+    else:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Set random seed
     np.random.seed(args.seed)
@@ -193,16 +196,17 @@ def main():
                                   help="size of style-image, default is the original size of style image")
     train_arg_parser.add_argument("--batch-size", type=int, default=16,
                                   help="batch size for training, default is 16")
+    train_arg_parser.add_argument("--lr", type=float, default=1e-3,
+                                  help="learning rate, default is 1e-3")
     train_arg_parser.add_argument("--epochs", type=int, default=1,
                                   help="number of training epochs, default is 1")
-
     train_arg_parser.add_argument("--seed", type=int, default=42,
                                   help="random seed for training")
 
-    train_arg_parser.add_argument("--lr", type=float, default=1e-3,
-                                  help="learning rate, default is 1e-3")
     train_arg_parser.add_argument("--log-interval", type=int, default=500,
                                   help="number of images after which the training loss is logged, default is 500")
+
+    train_arg_parser.add_argument('--mps', action='store_true', default=False, help='enable macOS GPU training')
 
     args = train_arg_parser.parse_args()
     train(args)
