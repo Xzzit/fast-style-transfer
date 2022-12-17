@@ -34,13 +34,12 @@ class CustomDataSet(Dataset):
         return tensor_image
 
 
-def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, pop_weight=1e1, image_size=256, batch_size=16,
-          model_name='inkwash'):
+def train(args):
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    np.random.seed(42)
-    torch.manual_seed(42)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
 
     transform = transforms.Compose([
         transforms.Resize(image_size),
@@ -153,10 +152,7 @@ def main():
 
     # Arguments for training
     train_arg_parser = argparse.ArgumentParser(description="parser for fast neural style transfer")
-    train_arg_parser.add_argument("--epochs", type=int, default=1,
-                                  help="number of training epochs, default is 1")
-    train_arg_parser.add_argument("--batch-size", type=int, default=16,
-                                  help="batch size for training, default is 16")
+
     train_arg_parser.add_argument("--dataset", type=str, required=True,
                                   help="path to training dataset, the path should point to a folder "
                                        "containing another folder with all the training images")
@@ -164,22 +160,35 @@ def main():
                                   help="path to style-image")
     train_arg_parser.add_argument("--save-model-dir", type=str, required=True,
                                   help="path to folder where trained model will be saved.")
-    train_arg_parser.add_argument("--image-size", type=int, default=256,
-                                  help="size of training images, default is 256 x 256")
-    train_arg_parser.add_argument("--style-size", type=int, default=None,
-                                  help="size of style-image, default is the original size of style image")
-    train_arg_parser.add_argument("--seed", type=int, default=42,
-                                  help="random seed for training")
+    train_arg_parser.add_argument("--model-name", type=str, default='Name',
+                                  help="name for saved model.")
+
     train_arg_parser.add_argument("--content-weight", type=float, default=1e5,
                                   help="weight for content-loss, default is 1e5")
     train_arg_parser.add_argument("--style-weight", type=float, default=1e10,
                                   help="weight for style-loss, default is 1e10")
     train_arg_parser.add_argument("--consistency-weight", type=float, default=1e1,
                                   help="weight for consistency-loss, default is 1e1")
+
+    train_arg_parser.add_argument("--image-size", type=int, default=256,
+                                  help="size of training images, default is 256 x 256")
+    train_arg_parser.add_argument("--style-size", type=int, default=None,
+                                  help="size of style-image, default is the original size of style image")
+    train_arg_parser.add_argument("--batch-size", type=int, default=16,
+                                  help="batch size for training, default is 16")
+    train_arg_parser.add_argument("--epochs", type=int, default=1,
+                                  help="number of training epochs, default is 1")
+
+    train_arg_parser.add_argument("--seed", type=int, default=42,
+                                  help="random seed for training")
+
     train_arg_parser.add_argument("--lr", type=float, default=1e-3,
                                   help="learning rate, default is 1e-3")
     train_arg_parser.add_argument("--log-interval", type=int, default=500,
                                   help="number of images after which the training loss is logged, default is 500")
+
+    args = train_arg_parser.parse_args()
+    train(args)
 
 
 if __name__ == "__main__":
