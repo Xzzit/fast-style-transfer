@@ -11,7 +11,8 @@ from torchvision import transforms
 import torch.onnx
 
 import utils
-from transformer_net import TransformerNet
+from models.autoencoder import Autoencoder
+from models.bottleNet import BottleNetwork
 from vgg import Vgg16
 
 
@@ -33,7 +34,7 @@ class CustomDataSet(Dataset):
 
 
 def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, pop_weight=1e5, image_size=256, batch_size=16,
+          content_weight=1e5, style_weight=1e10, pop_weight=1e1, image_size=256, batch_size=16,
           model_name='inkwash'):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -49,7 +50,7 @@ def train(dataset, style_image, save_model_dir, epochs,
     train_dataset = CustomDataSet(dataset, transform)
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
-    transformer = TransformerNet().to(device)
+    transformer = BottleNetwork().to(device)
     optimizer = Adam(transformer.parameters(), 1e-3)
     mse_loss = torch.nn.MSELoss()
 
@@ -140,7 +141,7 @@ def train(dataset, style_image, save_model_dir, epochs,
         save_model_filename = model_name + '_' + \
                               'c' + format(content_weight, '.0E').replace('+', '') + '_' + \
                               's' + format(style_weight, '.0E').replace('+', '') + '_' + \
-                              'p' + format(pop_weight, '.0E').replace('+', '') + '_' + \
+                              'p' + format(pop_weight, '.0E').replace('+', '') + \
                               ".pth"
         save_model_path = os.path.join(save_model_dir, save_model_filename)
         torch.save(transformer.state_dict(), save_model_path)
@@ -148,24 +149,38 @@ def train(dataset, style_image, save_model_dir, epochs,
 
 
 dataset = 'D:/Project/PyPro/data/coco2017/train2017'
-style_image = 'D:/Project/PyPro/data/monet_woman.jpg'
-save_model_dir = 'D:/Project/PyPro/StyleTransfer/StyleTransfer/my_models/monet_woman'
-epochs = 2
+save_model_dir = 'D:/Project/PyPro/StyleTransfer/Fast_Style_Transfer/pretrained_models/bottleNet'
+epochs = 1
 
 """
 Train single model once a time.
 """
+# style_image = 'D:/Project/PyPro/data/art/Claude_Monet_Le_Grand_Canal.jpg'
 # train(dataset, style_image, save_model_dir, epochs, 1e5, 1e10, 1e1)
 
 
 """
 Train multiple models with different hyper-parameters.
 """
-for c, s, p in zip([1e5, 1e5, 1e6, 1e7, 1e7], [1e10, 1e11, 1e11, 1e11, 1e12], [1e2, 1e2, 1e2, 1e2, 1e2]):
-    train(dataset=dataset,
-          style_image=style_image,
-          save_model_dir=save_model_dir,
-          epochs=epochs,
-          pop_weight=p,
-          style_weight=s,
-          content_weight=c)
+# style_image = 'D:/Project/PyPro/data/art/Claude_Monet_Le_Grand_Canal.jpg'
+# for c, s, p in zip([1e5, 1e5, 1e6, 1e7, 1e7], [1e10, 1e11, 1e11, 1e11, 1e12], [1e2, 1e2, 1e2, 1e2, 1e2]):
+#     train(dataset=dataset,
+#           style_image=style_image,
+#           save_model_dir=save_model_dir,
+#           epochs=epochs,
+#           pop_weight=p,
+#           style_weight=s,
+#           content_weight=c)
+
+
+'''
+Train model with multiple style references
+'''
+style_dir = 'D:/Project/PyPro/data/a'
+style_img_name = os.listdir(style_dir)
+
+for name in style_img_name:
+    style_image = os.path.join(style_dir, name)
+    train(dataset, style_image, save_model_dir, epochs,
+          content_weight=1e5, style_weight=1e10, pop_weight=1e1, image_size=256, batch_size=8,
+          model_name=name.replace('.jpg', ''))
