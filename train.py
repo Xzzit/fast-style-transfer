@@ -34,63 +34,80 @@ class CustomDataSet(Dataset):
 
 
 def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, pop_weight=1e1, image_size=256, batch_size=16,
+          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=16,
           model_name='inkwash'):
+    # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Set random seed
     np.random.seed(42)
     torch.manual_seed(42)
 
-    transform = transforms.Compose([
+    # Define dataloader transform function
+    content_transform = transforms.Compose([
         transforms.Resize(image_size),
         transforms.CenterCrop(image_size),
         transforms.ToTensor(),
         transforms.Lambda(lambda a: a.mul(255))
     ])
-    train_dataset = CustomDataSet(dataset, transform)
+
+    # Initialize dataloader
+    train_dataset = CustomDataSet(dataset, content_transform)
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
+    # Initialize fast neural style transfer model and optimizer
     transformer = BottleNetwork().to(device)
     optimizer = Adam(transformer.parameters(), 1e-3)
     mse_loss = torch.nn.MSELoss()
 
-    # Define pre-trained VGG net & style image's output in VGG
+    # Define pre-trained VGG net
     vgg = Vgg16(requires_grad=False).to(device)
+
+    # Define transform function of style image loader
     style_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
+
+    # Load style image
     style = utils.load_image(style_image, size=[image_size, image_size])
     style = style_transform(style)
     style = style.repeat(1, 1, 1, 1).to(device)
+
+    # Compute style features
     features_style = vgg(utils.normalize_batch(style))
     gram_style = [utils.gram_matrix(y) for y in features_style]
 
     # Train transformer net to match the style
     for e in range(epochs):
+
+        # Initialize model and loss
         transformer.train()
         agg_content_loss = 0.
         agg_style_loss = 0.
-        agg_pop_loss = 0.
+        agg_consistency_loss = 0.
         count = 0
-        for batch_id, x in enumerate(train_loader):
-            count += batch_size
-            optimizer.zero_grad()
 
+        for batch_id, x in enumerate(train_loader):
             '''
             transformer is the network which we use to stylize images
             x: original image (In this case, images in COCO dataset)
             y: stylized image
-            noise_x: original image with noise
-            noise_y: stylized noise_x
+            noise_x: original image with Gaussian noise
+            noise_y: stylized noise_x. aka transformer(noise_x)
             '''
+
+            count += batch_size
+            optimizer.zero_grad()
+
             x = x.to(device)
             y = transformer(x)
 
             # Add noise to original image to increase the consistency
-            noise = 1 / 6 * torch.randn(x.shape[0], 3, image_size, image_size)
+            noise = 1 / 6 * torch.randn(x.shape[0], x.shape[1], x.shape[2], x.shape[3])
             noise_x = x + noise.to(device)
 
+            # Normalize batches
             x = utils.normalize_batch(x)
             y = utils.normalize_batch(y)
 
@@ -111,37 +128,37 @@ def train(dataset, style_image, save_model_dir, epochs,
 
             # Compute the noise item loss
             noise_y = transformer(noise_x)
-            pop_loss = pop_weight * mse_loss(noise_y, y)
+            consistency_loss = consistency_weight * mse_loss(noise_y, y)
 
             # Compute the total loss
-            total_loss = content_loss + style_loss + pop_loss
+            total_loss = content_loss + style_loss + consistency_loss
             total_loss.backward()
             optimizer.step()
 
             # Output the loss information
             agg_content_loss += content_loss.item()
             agg_style_loss += style_loss.item()
-            agg_pop_loss += pop_loss.item()
+            agg_consistency_loss += consistency_loss.item()
 
             if (batch_id + 1) % 500 == 0:
-                message = "{}\tEpoch {}: [{}/{}]\tcontent: {:.3f}\tstyle: {:.3f}\tpop: {:.3f}\ttotal: {:.3f}".format(
+                message = "{}\tEpoch {}: [{}/{}]\tcontent: {:.3f}\tstyle: {:.3f}\tconsistency: {:.3f}\ttotal: {:.3f}".format(
                     time.ctime(),
                     e + 1,
                     count,
                     len(train_dataset),
                     agg_content_loss / (batch_id + 1),
                     agg_style_loss / (batch_id + 1),
-                    agg_pop_loss / (batch_id + 1),
-                    (agg_content_loss + agg_style_loss + agg_pop_loss) / (batch_id + 1)
+                    agg_consistency_loss / (batch_id + 1),
+                    (agg_content_loss + agg_style_loss + agg_consistency_loss) / (batch_id + 1)
                 )
                 print(message)
 
         # Save model
         transformer.eval()
         save_model_filename = model_name + '_' + \
-                              'c' + format(content_weight, '.0E').replace('+', '') + '_' + \
-                              's' + format(style_weight, '.0E').replace('+', '') + '_' + \
-                              'p' + format(pop_weight, '.0E').replace('+', '') + \
+                              'cont' + format(content_weight, '.0E').replace('+', '') + '_' + \
+                              'sty' + format(style_weight, '.0E').replace('+', '') + '_' + \
+                              'cons' + format(consistency_weight, '.0E').replace('+', '') + \
                               ".pth"
         save_model_path = os.path.join(save_model_dir, save_model_filename)
         torch.save(transformer.state_dict(), save_model_path)
@@ -168,7 +185,7 @@ Train multiple models with different hyper-parameters.
 #           style_image=style_image,
 #           save_model_dir=save_model_dir,
 #           epochs=epochs,
-#           pop_weight=p,
+#           consistency_weight=p,
 #           style_weight=s,
 #           content_weight=c)
 
@@ -182,5 +199,5 @@ style_img_name = os.listdir(style_dir)
 for name in style_img_name:
     style_image = os.path.join(style_dir, name)
     train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, pop_weight=1e1, image_size=256, batch_size=8,
+          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=8,
           model_name=name.replace('.jpg', ''))
