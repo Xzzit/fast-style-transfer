@@ -178,7 +178,7 @@ def main():
                                        "containing another folder with all the training images")
     train_arg_parser.add_argument("--style-image", type=str, required=True,
                                   help="path to style-image")
-    train_arg_parser.add_argument("--save-model-dir", type=str, required=True,
+    train_arg_parser.add_argument("--save-model-dir", type=str, default='./',
                                   help="path to folder where trained model will be saved.")
     train_arg_parser.add_argument("--model-name", type=str, default='Name',
                                   help="name for saved model.")
