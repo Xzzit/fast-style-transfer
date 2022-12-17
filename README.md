@@ -8,7 +8,7 @@ This repo is based on the code [**fast-neural-style-pytorch**](https://github.co
 
 ## Dependencies
 Tested With:
-* Windows 10
+* Windows 10 || Mac M1 chip
 * Python 3.7.15
 * Pytorch 1.10
 
@@ -23,5 +23,34 @@ pip install -r requirements.txt
 ## Hardware Requirements
 
 ## Usage
+Train the model
+
+```
+python train_arg.py --dataset <path/to/content/images/folder> --style-image <path/to/style/image/file>
+```
+
+- `--dataset`: path to training content images folder, I use Train images [118K/18GB] in [COCO 2017](https://cocodataset.org/#download).
+- `--style-image`: path to style-image.
+- `--save-model-dir`: path to folder where trained model will be saved.
+- `--model-name`: name of saved model.
+- `--content-weight`: weight for content-loss, default is 1e5.
+- `--style-weightt`: weight for content-loss, default is 1e10.
+- `--consistency-weight`: weight for content-loss, default is 1e1.
+- `--mps`: add it for running on macOS GPU
+
+Refer to `train_arg.py` for other command line arguments. For training new models you might have to tune the values of `--content-weight` and `--style-weight`.
+
+Stylize the image
+
+```
+python stylize_arg.py --content-image <path/to/content/image/file> --model <path/to/saved/model>
+```
+
+- `--content-image`: path to content image you want to stylize.
+- `--model`: saved model to be used for stylizing the image (eg: `mosaic.pth`)
+- `--output-path`: path for saving the output image.
+- `--output-name`: path for saving the output image.
+- `--content-scale`: factor for scaling down the content image if memory is an issue (eg: value of 2 will halve the height and width of content-image)
+- `--mps`: add it for running on macOS GPU
 
 ## What's New
