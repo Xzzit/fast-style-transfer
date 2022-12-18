@@ -34,8 +34,8 @@ python train_arg.py --dataset <path/to/content/images/folder> --style-image <pat
 - `--save-model-dir`: path to folder where trained model will be saved.
 - `--model-name`: name of saved model.
 - `--content-weight`: weight for content-loss, default is 1e5.
-- `--style-weightt`: weight for content-loss, default is 1e10.
-- `--consistency-weight`: weight for content-loss, default is 1e1.
+- `--style-weightt`: weight for style-loss, default is 1e10.
+- `--consistency-weight`: weight for consistency-loss, default is 1e1.
 - `--mps`: add it for running on macOS GPU
 
 Refer to `train_arg.py` for other command line arguments. For training new models you might have to tune the values of `--content-weight` and `--style-weight`.
