@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import argparse
 from PIL import Image
@@ -14,6 +15,7 @@ import torch.onnx
 import utils
 from models.autoencoder import Autoencoder
 from models.bottleNet import BottleNetwork
+from models.resNext import ResNext
 from vgg import Vgg16
 
 
@@ -58,8 +60,18 @@ def train(args):
     train_dataset = CustomDataSet(args.dataset, content_transform)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
 
-    # Initialize fast neural style transfer model and optimizer
-    transformer = BottleNetwork().to(device)
+    # Initialize fast neural style transfer model
+    if args.model_type == 'ae':
+        transformer = Autoencoder().to(device)
+    elif args.model_type == 'bo':
+        transformer = BottleNetwork().to(device)
+    elif args.model_type == 'res':
+        transformer = ResNext().to(device)
+    else:
+        print('Error: invalid selected architecture')
+        sys.exit()
+
+    # Initialize optimizer
     optimizer = Adam(transformer.parameters(), args.lr)
     mse_loss = torch.nn.MSELoss()
 
@@ -178,6 +190,9 @@ def main():
                                        "containing another folder with all the training images")
     train_arg_parser.add_argument("--style-image", type=str, required=True,
                                   help="path to style-image")
+    train_arg_parser.add_argument("--model-type", type=str, default='ae',
+                                  help="architecture for stylization network. including: 1. ae: Autoencoder; 2. "
+                                       "bo: bottleneck; 3. res: resNext")
     train_arg_parser.add_argument("--save-model-dir", type=str, default='./',
                                   help="path to folder where trained model will be saved.")
     train_arg_parser.add_argument("--model-name", type=str, default='Name',

@@ -1,6 +1,7 @@
 import os
 import re
 import argparse
+import sys
 
 import torch
 from torchvision import transforms
@@ -10,6 +11,7 @@ import torch.onnx
 import utils
 from models.autoencoder import Autoencoder
 from models.bottleNet import BottleNetwork
+from models.resNext import ResNext
 
 
 def stylize(args):
@@ -20,6 +22,7 @@ def stylize(args):
     else:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Load content image
     content_image = utils.load_image(args.content_image)
     content_transform = transforms.Compose([
         transforms.ToTensor(),
@@ -34,7 +37,18 @@ def stylize(args):
     content_image = content_transform(content_image).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        style_model = BottleNetwork()
+
+        # Initialize fast neural style transfer model
+        if args.model_type == 'ae':
+            style_model = Autoencoder().to(device)
+        elif args.model_type == 'bo':
+            style_model = BottleNetwork().to(device)
+        elif args.model_type == 'res':
+            style_model = ResNext().to(device)
+        else:
+            print('Error: invalid selected architecture')
+            sys.exit()
+
         state_dict = torch.load(args.model)
         # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
         for k in list(state_dict.keys()):
@@ -49,7 +63,6 @@ def stylize(args):
 
 
 def main():
-
     # Arguments for stylizing
     eval_arg_parser = argparse.ArgumentParser(description="parser for fast neural style transfer")
 
@@ -61,6 +74,10 @@ def main():
                                  help="path for saving the output image")
     eval_arg_parser.add_argument("--output-name", type=str, default='stylized.jpg',
                                  help="name of the stylized image")
+
+    eval_arg_parser.add_argument("--model-type", type=str, default='ae',
+                                 help="architecture for stylization network. including: 1. ae: Autoencoder; 2. "
+                                      "bo: bottleneck; 3. res: resNext")
 
     eval_arg_parser.add_argument("--content-scale", type=float, default=None,
                                  help="factor for scaling down the content image")
