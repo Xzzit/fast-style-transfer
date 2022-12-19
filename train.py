@@ -13,6 +13,7 @@ import torch.onnx
 import utils
 from models.autoencoder import Autoencoder
 from models.bottleNet import BottleNetwork
+from models.resNext import ResNext
 from vgg import Vgg16
 
 
@@ -56,7 +57,7 @@ def train(dataset, style_image, save_model_dir, epochs,
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
     # Initialize fast neural style transfer model and optimizer
-    transformer = BottleNetwork().to(device)
+    transformer = ResNext().to(device)
     optimizer = Adam(transformer.parameters(), 1e-3)
     mse_loss = torch.nn.MSELoss()
 
@@ -166,7 +167,7 @@ def train(dataset, style_image, save_model_dir, epochs,
 
 
 dataset = 'D:/Project/PyPro/data/coco2017/train2017'
-save_model_dir = 'D:/Project/PyPro/StyleTransfer/Fast_Style_Transfer/pretrained_models/bottleNet'
+save_model_dir = 'D:/Project/PyPro/StyleTransfer/Fast_Style_Transfer/pretrained_models/resNext'
 epochs = 1
 
 """
