@@ -51,7 +51,7 @@ python stylize_arg.py --content-image <path/to/content/image/file> --model <path
 - `--content-image`: path to content image you want to stylize.
 - `--model`: saved model to be used for stylizing the image (eg: `mosaic.pth`)
 - `--output-path`: path for saving the output image.
-- `--output-name`: path for saving the output image.
+- `--output-name`: name of output image.
 - `--content-scale`: factor for scaling down the content image if memory is an issue (eg: value of 2 will halve the height and width of content-image)
 - `--mps`: add it for running on macOS GPU
 - `--model-type`: architecture for stylization network. including: 1. ae: Autoencoder; 2. bo: bottleneck; 3. res: resNext.
