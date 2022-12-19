@@ -56,4 +56,4 @@ python stylize_arg.py --content-image <path/to/content/image/file> --model <path
 - `--mps`: add it for running on macOS GPU
 - `--model-type`: architecture for stylization network. including: 1. ae: Autoencoder; 2. bo: bottleneck; 3. res: resNext.
 
-Make sure that stylizaiton neural network has same 'model-type' with pre-trained model.
+Make sure that stylizaiton neural network has same `model-type` with pre-trained model.
