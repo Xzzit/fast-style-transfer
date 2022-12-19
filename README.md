@@ -39,8 +39,8 @@ python train_arg.py --dataset <path/to/content/images/folder> --style-image <pat
 - `--mps`: add it for running on macOS GPU
 - `--model-type`: architecture for stylization network. including: 1. ae: Autoencoder; 2. bo: bottleneck; 3. res: resNext.
 
-Refer to `train_arg.py` for other command line arguments. Refer to 'models' folder for details of neural network architecture.
-For training new models you might have to tune the values of `--content-weight`, `--style-weight` and '--consistency-weight'. 
+Refer to `train_arg.py` for other command line arguments. Refer to `models` folder for details of neural network architecture.
+For training new models you might have to tune the values of `--content-weight`, `--style-weight` and `--consistency-weight`. 
 
 ***Stylize the image*** :paintbrush:
 
