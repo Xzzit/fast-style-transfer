@@ -1,6 +1,6 @@
 # Fast Neural Style Transfer in Pytorch :art: :rocket:
 
-A Pytorch implementation of paper [**Perceptual Losses for Real-Time Style Transfer and Super-Resolution**](https://arxiv.org/abs/1603.08155) by *Justin Johnson, Alexandre Alahi, and Fei-Fei Li*. **Note that** the original paper proposes the algorithm to conduct 1) neural style transfer task and 2) image super-resolution task. This implementation can only be used to stylize images with arbitrary artistic style.
+A Pytorch implementation of paper [**Perceptual Losses for Real-Time Style Transfer and Super-Resolution**](https://arxiv.org/abs/1603.08155) by *Justin Johnson, Alexandre Alahi, and Fei-Fei Li*. ***Note that*** the original paper proposes the algorithm to conduct 1) neural style transfer task and 2) image super-resolution task. This implementation can only be used to stylize images with arbitrary artistic style.
 
 The idea 'neural style transfer' is proposed by *Leon A. Gatys, Alexander S. Ecker, Matthias Bethge* in paper [**Image Style Transfer Using Convolutional Neural Networks**](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf), where the content features are represented as outputs of some selected VGG-16 layers and style features are represented as their Gram matrix.
 
@@ -37,8 +37,10 @@ python train_arg.py --dataset <path/to/content/images/folder> --style-image <pat
 - `--style-weightt`: weight for style-loss, default is 1e10.
 - `--consistency-weight`: weight for consistency-loss, default is 1e1.
 - `--mps`: add it for running on macOS GPU
+- `--model-type`: architecture for stylization network. including: 1. ae: Autoencoder; 2. bo: bottleneck; 3. res: resNext.
 
-Refer to `train_arg.py` for other command line arguments. For training new models you might have to tune the values of `--content-weight` and `--style-weight`.
+Refer to `train_arg.py` for other command line arguments. Refer to 'models' folder for details of neural network architecture.
+For training new models you might have to tune the values of `--content-weight`, `--style-weight` and '--consistency-weight'. 
 
 ***Stylize the image*** :paintbrush:
 
@@ -52,3 +54,6 @@ python stylize_arg.py --content-image <path/to/content/image/file> --model <path
 - `--output-name`: path for saving the output image.
 - `--content-scale`: factor for scaling down the content image if memory is an issue (eg: value of 2 will halve the height and width of content-image)
 - `--mps`: add it for running on macOS GPU
+- `--model-type`: architecture for stylization network. including: 1. ae: Autoencoder; 2. bo: bottleneck; 3. res: resNext.
+
+Make sure that stylizaiton neural network has same 'model-type' with pre-trained model.
