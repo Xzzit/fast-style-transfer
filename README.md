@@ -19,8 +19,15 @@ pip install -r requirements.txt
 ```
 
 ## Example Output
+```
+python stylize_arg.py --content-image ./pretrained_models/bear.jpg --model ./pretrained_models/Fauvism_André-Derain_Pier.pth
+```
 
-## Hardware Requirements
+<p align="center">
+    <img src="pretrained_models/bear.jpg" height="300px" title="content image">
+    <img src="pretrained_models/Fauvism_André-Derain_Pier.jpg" height="300px" title="style image">
+    <img src="pretrained_models/stylized.jpg" height="300px" title="generated image">
+</p>
 
 ## Usage
 ***Train the model*** :hammer_and_wrench:
