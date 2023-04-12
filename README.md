@@ -8,8 +8,8 @@ This repo is based on the code [**fast-neural-style-pytorch**](https://github.co
 
 ## Dependencies
 Tested With:
-* Windows 10 || Mac M1 chip
-* Python 3.7.15
+* Windows 10/11 || Mac M1 chip || Ubuntu 22.04 (Reconmended)
+* Python 3.7
 * Pytorch 1.10
 
 ```
