@@ -11,7 +11,7 @@ from torchvision import transforms
 import torch.onnx
 
 import utils
-import models
+from models import *
 from vgg import Vgg16
 
 
