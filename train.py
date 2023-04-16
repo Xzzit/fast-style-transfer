@@ -33,7 +33,7 @@ class CustomDataSet(Dataset):
 
 
 def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=12,
+          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=16,
           model_name='inkwash', model='Autoencoder'):
     # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
