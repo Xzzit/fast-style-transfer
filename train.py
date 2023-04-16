@@ -33,7 +33,7 @@ class CustomDataSet(Dataset):
 
 
 def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=16,
+          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=24,
           model_name='inkwash'):
     # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,7 +55,7 @@ def train(dataset, style_image, save_model_dir, epochs,
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
     # Initialize fast neural style transfer model and optimizer
-    transformer = ResNext().to(device)
+    transformer = Autoencoder().to(device)
     optimizer = Adam(transformer.parameters(), 1e-3)
     mse_loss = torch.nn.MSELoss()
 
@@ -164,15 +164,15 @@ def train(dataset, style_image, save_model_dir, epochs,
         print("\nTrained model saved at ", save_model_path)
 
 
-dataset = 'D:/Project/PyPro/data/coco2017/train2017'
-save_model_dir = 'D:/Project/PyPro/StyleTransfer/Fast_Style_Transfer/pretrained_models/resNext'
+dataset = '/media/xzzit/APP/Project/PyPro/data/coco2017/train2017'
+save_model_dir = 'pretrained_models/'
 epochs = 1
 
 """
 Train single model once a time.
 """
-# style_image = 'D:/Project/PyPro/data/art/Claude_Monet_Le_Grand_Canal.jpg'
-# train(dataset, style_image, save_model_dir, epochs, 1e5, 1e10, 1e1)
+style_image = 'pretrained_models/Fauvism_André-Derain_Pier.jpg'
+train(dataset, style_image, save_model_dir, epochs, 1e5, 1e10, 1e1)
 
 
 """
