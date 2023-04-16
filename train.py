@@ -33,8 +33,8 @@ class CustomDataSet(Dataset):
 
 
 def train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=24,
-          model_name='inkwash'):
+          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=12,
+          model_name='inkwash', model='Autoencoder'):
     # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -55,7 +55,7 @@ def train(dataset, style_image, save_model_dir, epochs,
     train_loader = DataLoader(train_dataset, batch_size=batch_size)
 
     # Initialize fast neural style transfer model and optimizer
-    transformer = Autoencoder().to(device)
+    transformer = eval(model)().to(device)
     optimizer = Adam(transformer.parameters(), 1e-3)
     mse_loss = torch.nn.MSELoss()
 
@@ -171,8 +171,8 @@ epochs = 1
 """
 Train single model once a time.
 """
-style_image = 'pretrained_models/Fauvism_André-Derain_Pier.jpg'
-train(dataset, style_image, save_model_dir, epochs, 1e5, 1e10, 1e1)
+# style_image = 'pretrained_models/Fauvism_André-Derain_Pier.jpg'
+# train(dataset, style_image, save_model_dir, epochs, 1e5, 1e10, 1e1)
 
 
 """
@@ -192,11 +192,24 @@ Train multiple models with different hyper-parameters.
 '''
 Train model with multiple style references
 '''
-style_dir = 'D:/Project/PyPro/data/a'
-style_img_name = os.listdir(style_dir)
+# style_dir = 'D:/Project/PyPro/data/a'
+# style_img_name = os.listdir(style_dir)
 
-for name in style_img_name:
-    style_image = os.path.join(style_dir, name)
-    train(dataset, style_image, save_model_dir, epochs,
-          content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=8,
-          model_name=name.replace('.jpg', ''))
+# for name in style_img_name:
+#     style_image = os.path.join(style_dir, name)
+#     train(dataset, style_image, save_model_dir, epochs,
+#           content_weight=1e5, style_weight=1e10, consistency_weight=1e1, image_size=256, batch_size=8,
+#           model_name=name.replace('.jpg', ''))
+
+
+"""
+Train multiple models.
+"""
+style_image = 'pretrained_models/Fauvism_André-Derain_Pier.jpg'
+for m in ['AutoencoderAttention', 'BottleNetwork', 'DenseNet', 'ResNext']:
+    train(dataset=dataset,
+          style_image=style_image,
+          save_model_dir=save_model_dir,
+          epochs=epochs,
+          model=m,
+          model_name=m)
