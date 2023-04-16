@@ -7,9 +7,7 @@ from torchvision.utils import save_image
 import torch.onnx
 
 import utils
-from models.autoencoder import Autoencoder
-from models.bottleNet import BottleNetwork
-from models.resNext import ResNext
+from models import *
 
 
 def stylize(content_image, model, output_image, name):
@@ -31,7 +29,7 @@ def stylize(content_image, model, output_image, name):
     content_image = content_transform(content_image).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        style_model = ResNext()
+        style_model = Autoencoder()
         state_dict = torch.load(model)
         # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
         for k in list(state_dict.keys()):
@@ -48,10 +46,10 @@ def stylize(content_image, model, output_image, name):
 '''
 This code is used for single photo stylizing
 '''
-# model = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer\pretrained_models/Fauvism_André-Derain_Pier_c1E05_s1E10_p1E01.pth'
-# img_dir = 'D:\Project\PyPro\data\coco2017/val2017/000000000285.jpg'
-# output_image = './'
-# stylize(img_dir, model, output_image, '1.jpg')
+model = 'pretrained_models/inkwash_cont1E05_sty1E10_cons1E01.pth'
+img_dir = 'pretrained_models/bear.jpg'
+output_image = './'
+stylize(img_dir, model, output_image, '1.jpg')
 
 '''
 This code is used for multiple photo stylizing with one model
@@ -94,16 +92,16 @@ This code is used for multiple photo stylizing with multiple model
 '''
 This code is used for single photo stylizing with multiple models
 '''
-model_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer\pretrained_models/resNext'
-model_list = os.listdir(model_dir)
+# model_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer\pretrained_models/resNext'
+# model_list = os.listdir(model_dir)
 
-img_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer/bear.jpg'
+# img_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer/bear.jpg'
 
-output_folder_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer/resNext_outputs'
+# output_folder_dir = 'D:\Project\PyPro\StyleTransfer\Fast_Style_Transfer/resNext_outputs'
 
-for model in model_list:
-    start_name = model.replace('.pth', '')
+# for model in model_list:
+#     start_name = model.replace('.pth', '')
 
-    model = os.path.join(model_dir, model)
+#     model = os.path.join(model_dir, model)
 
-    stylize(img_dir, model, output_folder_dir, start_name+'.jpg')
+#     stylize(img_dir, model, output_folder_dir, start_name+'.jpg')
