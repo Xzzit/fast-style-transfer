@@ -13,9 +13,7 @@ from torchvision import transforms
 import torch.onnx
 
 import utils
-from models.autoencoder import Autoencoder
-from models.bottleNet import BottleNetwork
-from models.resNext import ResNext
+from models import *
 from vgg import Vgg16
 
 
