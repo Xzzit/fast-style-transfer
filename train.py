@@ -103,7 +103,7 @@ def train(dataset, style_image, save_model_dir, epochs,
             y = transformer(x)
 
             # Add noise to original image to increase the consistency
-            noise = 1 / 6 * torch.randn(x.shape[0], x.shape[1], x.shape[2], x.shape[3])
+            noise = 1 / 10 * (torch.randn(x.shape[0], x.shape[1], x.shape[2], x.shape[3]) - 0.5)
             noise_x = x + noise.to(device)
 
             # Normalize batches
