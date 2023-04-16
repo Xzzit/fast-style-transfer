@@ -206,7 +206,7 @@ Train model with multiple style references
 Train multiple models.
 """
 style_image = 'pretrained_models/Fauvism_André-Derain_Pier.jpg'
-for m in ['AutoencoderAttention', 'BottleNetwork', 'DenseNet', 'ResNext']:
+for m in ['Autoencoder', 'AutoencoderAttention', 'BottleNetwork', 'DenseNet', 'ResNext']:
     train(dataset=dataset,
           style_image=style_image,
           save_model_dir=save_model_dir,
