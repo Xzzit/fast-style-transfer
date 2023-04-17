@@ -29,7 +29,7 @@ def stylize(content_image, model, output_image, name):
     content_image = content_transform(content_image).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        style_model = Autoencoder()
+        style_model = AutoencoderOld()
         state_dict = torch.load(model)
         # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
         for k in list(state_dict.keys()):
@@ -46,23 +46,23 @@ def stylize(content_image, model, output_image, name):
 '''
 This code is used for single photo stylizing
 '''
-model = 'pretrained_models/inkwash_cont1E05_sty1E10_cons1E01.pth'
-img_dir = 'pretrained_models/bear.jpg'
-output_image = './'
-stylize(img_dir, model, output_image, '1.jpg')
+# model = 'pretrained_models/AutoencoderOld.pth'
+# img_dir = 'pretrained_models/bear.jpg'
+# output_image = './'
+# stylize(img_dir, model, output_image, 'pretrained_models/1.jpg')
 
 '''
 This code is used for multiple photo stylizing with one model
 '''
-# model = 'D:/Project/PyPro/StyleTransfer/StyleTransfer/my_models/inkwash_2.pth'
-# img_dir = 'D:/Project/CPro/instant-ngp/data/nerf/real_world/mouatain_1/images'
-# output_dir = 'D:/Project/CPro/instant-ngp/data/nerf/real_world/mouatain_1/style_images'
-#
-# dirlist = os.listdir(img_dir)
-# for name in dirlist:
-#     print(f'Painting: {name}')
-#     content_image = os.path.join(img_dir, name)
-#     stylize(cuda, content_image, content_scale, model, output_dir, name)
+model = 'pretrained_models/AutoencoderOld.pth'
+img_dir = '/media/xzzit/APP/Project/CPro/instant-ngp2023_4_17/data/nerf/real_world/mountain/mountain_1/baseline'
+output_dir = 'pretrained_models/mountain_ae_old'
+
+dirlist = os.listdir(img_dir)
+for name in dirlist:
+    print(f'Painting: {name}')
+    content_image = os.path.join(img_dir, name)
+    stylize(content_image, model, output_dir, name)
 
 '''
 This code is used for multiple photo stylizing with multiple model
