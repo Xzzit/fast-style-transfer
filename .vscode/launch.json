@@ -1,0 +1,30 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Train",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train_arg.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--dataset", "/home/xzzit/Data/ImageData/CoCo/train2017",
+            "--style-image", "pretrained_models/Fauvism_André-Derain_Pier.jpg",
+            "--batch-size", "4",
+            "--style-weight", "2.5e4"]
+        },
+        {
+            "name": "Python: Stylize",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/stylize_arg.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--content-image", "./pretrained_models/bear.jpg",
+            "--model", "Name_cont1E00_sty5E03_cons1E03tv1E03_.pth"]
+        }
+    ]
+}
