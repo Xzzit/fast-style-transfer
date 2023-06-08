@@ -24,13 +24,10 @@ def stylize(args):
     content_image = utils.load_image(args.content_image)
     content_transform = transforms.Compose([
         transforms.ToTensor(),
-        # mean=[0.40760392, 0.45795686, 0.48501961], std=[1, 1, 1]
-        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[1, 1, 1]),
         transforms.Lambda(lambda x: x.mul_(255))
     ])
     output_transform = transforms.Compose([
-        transforms.Lambda(lambda x: x.mul_(1. / 255)),
-        # transforms.Normalize(mean=[-0.185, -0.156, -0.106], std=[1, 1, 1]),
+        transforms.Lambda(lambda x: x.mul_(1. / 255))
     ])
     content_image = content_transform(content_image).unsqueeze(0).to(device)
 
@@ -43,6 +40,8 @@ def stylize(args):
             style_model = BottleNetwork().to(device)
         elif args.model_type == 'res':
             style_model = ResNext().to(device)
+        elif args.model_type == 'dense':
+            style_model = DenseNet().to(device)
         else:
             print('Error: invalid selected architecture')
             sys.exit()
@@ -64,9 +63,9 @@ def main():
     # Arguments for stylizing
     eval_arg_parser = argparse.ArgumentParser(description="parser for fast neural style transfer")
 
-    eval_arg_parser.add_argument("--content-image", type=str, required=True,
+    eval_arg_parser.add_argument("--content-image", '--c', type=str, required=True,
                                  help="path to content image you want to stylize")
-    eval_arg_parser.add_argument("--model", type=str, required=True,
+    eval_arg_parser.add_argument("--model", '--m', type=str, required=True,
                                  help="saved model to be used for stylizing the image")
     eval_arg_parser.add_argument("--output-path", type=str, default='./',
                                  help="path for saving the output image")
@@ -75,7 +74,7 @@ def main():
 
     eval_arg_parser.add_argument("--model-type", type=str, default='ae',
                                  help="architecture for stylization network. including: 1. ae: Autoencoder; 2. "
-                                      "bo: bottleneck; 3. res: resNext")
+                                      "bo: bottleneck; 3. res: resNext; 4. dense: DenseNet")
 
     eval_arg_parser.add_argument("--content-scale", type=float, default=None,
                                  help="factor for scaling down the content image")
