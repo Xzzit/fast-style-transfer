@@ -46,7 +46,7 @@ def stylize(args):
             print('Error: invalid selected architecture')
             sys.exit()
 
-        state_dict = torch.load(args.model)
+        state_dict = torch.load(args.model, map_location=device)
         # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
         for k in list(state_dict.keys()):
             if re.search(r'in\d+\.running_(mean|var)$', k):
